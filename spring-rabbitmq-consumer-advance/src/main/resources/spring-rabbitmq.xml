@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:rabbit="http://www.springframework.org/schema/rabbit"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/rabbit http://www.springframework.org/schema/rabbit/spring-rabbit.xsd">
+
+    <!--引入配置文件-->
+    <context:property-placeholder location="classpath:rabbitmq.properties"/>
+    <!--引入配置文件-->
+    <context:property-placeholder location="classpath:rabbitmq.properties"/>
+    <!--定义rabbitmq connectionFactory-->
+    <rabbit:connection-factory id="connectionFactory"
+                               host="${rabbitmq.host}"
+                               port="${rabbitmq.port}"
+                               username="${rabbitmq.username}"
+                               password="${rabbitmq.password}"
+                               virtual-host="${rabbitmq.virtual-host}"/>
+
+    <!--通配模式,队列监听器-->
+    <!--<bean id="directListener1" class="com.atguigu.rabbitmq.listener.DirectListener1"/>-->
+    <!--<bean id="manualAckDirectListener" class="com.atguigu.rabbitmq.listener.ManualAckDirectListener"/>-->
+    <!--<bean id="qosListener" class="com.atguigu.rabbitmq.listener.QosListener"/>-->
+    <bean id="DLXListener" class="com.atguigu.rabbitmq.listener.DLXListener"/>
+    <bean id="testDLXListener" class="com.atguigu.rabbitmq.listener.TestDLXListener"/>
+
+    <rabbit:listener-container connection-factory="connectionFactory" auto-declare="true"
+                               acknowledge="manual">
+        <!--路由模式 队列监听-->
+        <!--<rabbit:listener ref="directListener1" queue-names="spring_routing_queue_1"/>-->
+        <!--<rabbit:listener ref="manualAckDirectListener" queue-names="spring_routing_queue_1"/>-->
+        <!--<rabbit:listener ref="qosListener" queue-names="spring_routing_queue_1"/>-->
+        <rabbit:listener ref="DLXListener" queue-names="queue_dlx"/>
+        <rabbit:listener ref="testDLXListener" queue-names="test_queue_dlx"/>
+    </rabbit:listener-container>
+</beans>
